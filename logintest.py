@@ -41,7 +41,7 @@ async def auth_google(code: str):
     # Encode user information as JWT token
     user_info_dict = user_info.json()
     jwt_token = jwt.encode({"sub": user_info_dict["id"], "username": user_info_dict["email"]}, SECRET_KEY,
-                           algorithms=["HS256"])
+                           algorithm="HS256")
 
     # Return JWT token in the response
     return {"access_token": jwt_token, "token_type": "bearer"}
