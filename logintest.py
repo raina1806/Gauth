@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from starlette.responses import RedirectResponse
 from config import CLIENT_ID, CLIENT_SECRET,secret_key
-
+from jose import JWTError
 from fastapi.security import OAuth2PasswordBearer
 import requests
 import jwt
@@ -48,7 +48,13 @@ async def auth_google(code: str):
 
 @app.get("/token")
 async def get_token(token: str = Depends(oauth2_scheme)):
-    return jwt.decode(token, GOOGLE_CLIENT_SECRET, algorithms=["HS256"])
+    try:
+        # Attempt to decode and verify the token
+        decoded_token = jwt.decode(token, GOOGLE_CLIENT_SECRET, algorithms=["HS256"])
+        return decoded_token
+    except JWTError as e:
+        # Handle JWT decoding errors, which may include token expiration
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
 
 @app.get("/")
 async def home():
